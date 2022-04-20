@@ -108,27 +108,29 @@ public class NQueen {
 
     /**
      * 带有备忘录的N皇后问题 在摆放时，提前确定是否跟之前的冲突，而不是等摆放到最后才做决定
-     * n = 7 时 0.017s,answer = 40                      0.008s
-     * n = 8 时  0.008s,answer =92                      0.019s
-     * n = 9 时 0.02s,answer = 352                      0.023s
-     * n = 10 时 0.098s,answer = 724                    0.075s
-     * n = 13 时 2.225s,answer = 73712                  1.392s
-     * n = 14 时 12.572s,answer = 365596                4.407s
-     * n = 15 时 95s,answer = 2279184                   28.151s
+     * n = 7 时 0.017s,answer = 40              加入列缓存: 0.008s,answer = 40
+     * n = 8 时  0.008s,answer =92                        0.019s,answer = 92
+     * n = 9 时 0.02s,answer = 352                        0.026s,answer = 352
+     * n = 10 时 0.098s,answer = 724                      0.099s,answer = 724
+     * n = 13 时 2.225s,answer = 73712                    1.891s,answer = 73712
+     * n = 14 时 12.572s,answer = 365596                  9.57s,answer = 365596
+     * n = 15 时 95s,answer = 2279184                     72.178s,answer = 2279184
      * 主要耗时在isPossible()函数
      * @param n 棋盘大小
      * @return
      */
     public static ArrayList<ArrayList<String>> nQueenWithMemory(int n){
         ArrayList<Position> pickedMemory = new ArrayList<>();
+        HashSet<Integer> pickedCol = new HashSet<>();
         ArrayList<ArrayList<String>> result = new ArrayList<>();
 
-        nQueenWithMemory(n,0,pickedMemory,result);
+        nQueenWithMemory(n,0,pickedMemory,pickedCol,result);
         return result;
     }
 
     private static void nQueenWithMemory(int n ,int row,
                                          ArrayList<Position> pickedMemory,
+                                         HashSet<Integer> pickedCol,
                                          ArrayList<ArrayList<String>> result){
         if(row == n){
             ArrayList<String> oneAnswer = new ArrayList<>();
@@ -140,15 +142,22 @@ public class NQueen {
         }
 
         for(int col = 0; col < n ; col ++){
-            if(isPossible(pickedMemory,row,col)){
+            if(isPossible(pickedMemory,pickedCol,row,col)){
                 pickedMemory.add(new Position(row,col));
-                nQueenWithMemory(n,row + 1, pickedMemory,result);
+                pickedCol.add(col);
+                nQueenWithMemory(n,row + 1, pickedMemory,pickedCol,result);
                 pickedMemory.remove(pickedMemory.size() - 1);
+                pickedCol.remove(col);
             }
         }
     }
 
-    private static boolean isPossible(ArrayList<Position> pickedMemory,int row, int col){
+    private static boolean isPossible(ArrayList<Position> pickedMemory,
+                                      HashSet<Integer> pickedCol,
+                                      int row, int col){
+        if(pickedCol.contains(col)){
+            return false;
+        }
         for(Position position : pickedMemory){
             if(position.col == col || Math.abs(position.row - row) == Math.abs(position.col - col)){
                 return false;
@@ -251,7 +260,7 @@ public class NQueen {
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        ArrayList<ArrayList<String>> result = nQueen(7);
+        ArrayList<ArrayList<String>> result = nQueenWithMemory(8);
 //        for(int index = 0 ; index < result.size() ; index ++){
 //            ArrayList<String> oneAnswer = result.get(index);
 //            System.out.println("结果" + (index + 1));
