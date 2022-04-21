@@ -159,7 +159,7 @@ public class NQueen {
             return false;
         }
         for(Position position : pickedMemory){
-            if(position.col == col || Math.abs(position.row - row) == Math.abs(position.col - col)){
+            if(Math.abs(position.row - row) == Math.abs(position.col - col)){
                 return false;
             }
         }
@@ -167,100 +167,84 @@ public class NQueen {
     }
 
     /**
-     *
-     * n = 7 已选 6.765s
+     * 使用数组进行棋盘摆放
+     * 保存存放位置进行摆放统计                     使用数组进行棋盘摆放统计
+     * n = 7 时 0.017s,answer = 40                   0.002s,answer = 40
+     * n = 8 时  0.008s,answer =92                   0.02s,answer = 92
+     * n = 9 时 0.02s,answer = 352                   0.021s,answer = 352
+     * n = 10 时 0.098s,answer = 724                 0.054s,answer = 724
+     * n = 13 时 2.225s,answer = 73712               3.395s,answer = 73712
+     * n = 14 时 12.572s,answer = 365596             19.784s,answer = 365596
+     * n = 15 时 95s,answer = 2279184                147.752s,answer = 2279184
      * @param n
      * @return
      */
-    public static ArrayList<ArrayList<String>> nQueenWithMemory2(int n){
-        int[][] isPossible = new int[n][n];
-        for(int row = 0 ; row < n ; row ++){
+    public static ArrayList<ArrayList<String>> nQueenWithArray(int n){
+        String[][] board = new String[n][n];
+        for(int row = 0 ; row < n ; row++){
             for(int col = 0 ; col < n ; col ++){
-                isPossible[row][col] = 1; //1 可能，0 已选， -1不可能
+                board[row][col] = "-";
             }
         }
         ArrayList<ArrayList<String>> result = new ArrayList<>();
-        nQueenWithMemory2(n,0,isPossible,result);
+        nQueenWithArray(n,board,0,result);
         return result;
     }
 
-    private static void nQueenWithMemory2(int n , int row ,int[][] isPossible,ArrayList<ArrayList<String>> result){
-
+    private static void nQueenWithArray(int n , String[][] board,int row, ArrayList<ArrayList<String>> result){
         if(row == n){
-            ArrayList<String> oneAnswer = new ArrayList<>();
-            for(int rowIndex = 0 ; rowIndex < n ; rowIndex ++){
+            ArrayList<String> answer = new ArrayList<>();
+            for(int rowIndex = 0 ;rowIndex < n ; rowIndex ++){
+                StringBuilder sb = new StringBuilder();
                 for(int colIndex = 0 ; colIndex < n ; colIndex ++){
-                    if(isPossible[rowIndex][colIndex] == 0){
-                        oneAnswer.add(generateRowPicked(n,colIndex));
-                    }
+                    sb.append(board[rowIndex][colIndex]);
                 }
+                answer.add(sb.toString());
             }
-            if(oneAnswer.size() == n){
-                result.add(oneAnswer);
-            }
+            result.add(answer);
             return;
         }
-
-        for(int col = 0 ; col < n ; col ++){
-            if(isPossible[row][col] == 1){ //可能的
-                //不选
-                isPossible[row][col] = 0;
-                //同行右边的数据不要管，反正直接到下一行
-                //下面的数据标记成不可能
-
-                //同列的
-                for(int belowRow = row + 1 ; belowRow < n ; belowRow ++){
-                    isPossible[belowRow][col] = -1;
-                }
-
-                //右下角
-                for(int below = row + 1,rightCol = col + 1; below < n && rightCol < n ;){
-                    isPossible[below][rightCol] = -1;
-                    below ++;
-                    rightCol ++;
-                }
-
-                //左下角
-                for(int below = row + 1,rightCol = col - 1; below < n && rightCol >= 0 ;){
-                    isPossible[below][rightCol] = -1;
-                    below ++;
-                    rightCol -- ;
-                }
-
-                nQueenWithMemory2(n,row + 1,isPossible,result);
-
-                //不选,数据恢复
-                isPossible[row][col] = 1;
-                //同行右边的数据不要管，反正直接到下一行
-                //下面的数据标记成不可能
-
-                //同列的
-                for(int belowRow = row + 1 ; belowRow < n ; belowRow ++){
-                    isPossible[belowRow][col] = 1;
-                }
-
-                //右下角
-                for(int below = row + 1,rightCol = col + 1; below < n && rightCol < n ;){
-                    isPossible[below][rightCol] = 1;
-                    below ++;
-                    rightCol ++;
-                }
-
-                //左下角
-                for(int below = row + 1,rightCol = col - 1; below < n && rightCol >= 0 ;){
-                    isPossible[below][rightCol] = 1;
-                    below ++;
-                    rightCol -- ;
-                }
-                nQueenWithMemory2(n,row + 1,isPossible,result);
-
+        for(int col = 0; col < n ; col++){
+            if(isValid(board,row,col)){
+                board[row][col] = "Q";
+                nQueenWithArray(n,board,row + 1, result);
+                board[row][col] = "-";
             }
         }
+    }
+
+    /**
+     * 检查是否可以在row,col位置放置皇后
+     * @param board
+     * @param row
+     * @param col
+     * @return
+     */
+    private static boolean isValid(String[][]board, int row, int col){
+        //检查前面行的同列是否已经放置皇后
+        for(int rowIndex = 0 ; rowIndex < row ;rowIndex ++){
+            if("Q".equals(board[rowIndex][col])){
+                return false;
+            }
+        }
+        //检查左上角是否已经放置皇后
+        for(int rowIndex = row -1 , colIndex = col -1 ; rowIndex >= 0 && colIndex >=0;rowIndex--,colIndex--){
+            if("Q".equals(board[rowIndex][colIndex])){
+                return false;
+            }
+        }
+        //检查右上角是否已经放置皇后
+        for(int rowIndex = row -1 , colIndex = col + 1 ; rowIndex >= 0 && colIndex < board.length ;rowIndex--,colIndex++){
+            if( "Q".equals(board[rowIndex][colIndex]) ){
+                return false;
+            }
+        }
+        return true;
     }
 
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
-        ArrayList<ArrayList<String>> result = nQueenWithMemory(8);
+        ArrayList<ArrayList<String>> result =  nQueenWithArray(15);
 //        for(int index = 0 ; index < result.size() ; index ++){
 //            ArrayList<String> oneAnswer = result.get(index);
 //            System.out.println("结果" + (index + 1));
@@ -269,7 +253,7 @@ public class NQueen {
 //            }
 //        }
         long end = System.currentTimeMillis();
-        System.out.println("Finished.duration = " + ((end - start) / 1000f) + "s,answer = " + result.size());
+        System.out.println("Finished.duration = " + ((end - start) / 1000f) +  "s,answer = " + result.size());
 
 //        long start2 = System.currentTimeMillis();
 //        ArrayList<ArrayList<String>> result2 = nQueenWithMemory2(7);
