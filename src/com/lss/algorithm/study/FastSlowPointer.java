@@ -22,5 +22,44 @@ public class FastSlowPointer {
         return false;
     }
 
+    /**
+     *
+     * @param head 链表
+     * @return     返回链表中环开始的地方
+     * 1.
+     *  快慢指针在慢指针走了k步后相遇，相遇点距离环起点m处
+     *  那么快指针走了2k步，也就是说，第一次到达m处时，已经走了k步，然后走了k步很多圈回到m处，
+     *  --> k步可以相当于很多圈
+     *
+     *  2. 调整一个指针回到起点，然后以同样的速度开始走到环开始的地方，走了k-m步，
+     *   另外一个指针也走了k-m步，k-m + 起点m = k
+     *   上面可知，k步可以相当于很多圈。
+     *   那再走k-m回到了以环开始的很多圈。
+     *   --> 两指针在环开的地方相遇。
+     *          k - m
+     *  - - - - - - - - -
+     *                 / \
+     *                /   \
+     *                \   /  在此相遇 m
+     *                \  /
+     *                 --
+     *
+     */
+    @SuppressWarnings("rawtypes")
+    public static Node detectCycleStart(Node head){
+        Node slow = head;
+        Node fast = head;
+        while (fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+            if(slow == fast) break;
+        }
+        slow = head;
+        while(slow != fast){
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return slow;
+    }
 
 }
