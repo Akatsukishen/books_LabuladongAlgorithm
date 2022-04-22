@@ -62,4 +62,34 @@ public class FastSlowPointer {
         return slow;
     }
 
+    /**
+     *
+     *   1    ->   2   ->   3   -> null
+     *  slow
+     *  fast
+     *  1    ->   2   ->   3   -> null
+     *           slow
+     *                    fast
+     *
+     *  1    ->   2   ->   3   ->  4  -->  null
+     *  slow
+     *  fast
+     *  1    ->   2   ->   3   ->  4  -->  null
+     *                    slow
+     *                                     fast
+     * @param head 链表头节点
+     * @return     找到链表中间节点
+     */
+    @SuppressWarnings("rawtypes")
+    public static Node findMiddle(Node head){
+        Node fast = head;
+        Node slow = head;
+        while(fast != null && fast.next != null){
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+
 }
