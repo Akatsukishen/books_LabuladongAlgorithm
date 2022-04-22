@@ -91,5 +91,36 @@ public class FastSlowPointer {
         return slow;
     }
 
+    /**
+     *  k = 2
+     *  1    ->   2   ->   3   ->  4  -->  null
+     *  slow
+     *  fast
+     *  fast先走k步
+     *  1    ->   2   ->   3   ->  4  -->  null
+     *  slow
+     *                    fast
+     *  结束状态
+     *  1    ->   2   ->   3   ->  4  -->  null
+     *                    slow
+     *                                     fast
+     * @param head  链表头节点
+     * @param k     倒数第k个节点
+     * @return      返回链表中倒数第k个节点
+     */
+    @SuppressWarnings("rawtypes")
+    public static Node findKFromLast(Node head,int k){
+        Node fast = head;
+        Node slow = head;
+        while (k > 0){
+            fast = fast.next;
+            k --;
+        }
+        while (fast != null){
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
 
 }
