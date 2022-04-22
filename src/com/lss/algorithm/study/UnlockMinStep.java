@@ -15,7 +15,8 @@ public class UnlockMinStep {
         Queue<String> next = new LinkedList<>();
         Set<String> visited = new HashSet<>();
         int step = 0;
-        next.add(start);
+        next.offer(start);
+        visited.add(start);
 
         while (!next.isEmpty()){
             int size = next.size();
@@ -31,12 +32,12 @@ public class UnlockMinStep {
                     String plus = plusOne(cur,j);
                     if(!visited.contains(plus)){
                         visited.add(plus);
-                        next.add(plus);
+                        next.offer(plus);
                     }
                     String minus = minusOne(cur,j);
                     if(!visited.contains(minus)){
                         visited.add(minus);
-                        next.add(minus);
+                        next.offer(minus);
                     }
                 }
             }
@@ -46,6 +47,67 @@ public class UnlockMinStep {
         return -1;
     }
 
+    /**
+     * 如下情况
+     *    单向dfs 需要遍历整个树节点
+     *         *
+     *       /   \
+     *      *     *
+     *     / \   / \
+     *    *  *  *   *
+     *   /\ /\  / \/ \
+     *  * * * * t ** *
+     * 双向dfs可以减少遍历的节点
+     *         s
+     *       /   \
+     *      s1   s12
+     *     / \   / \
+     *    *  *  t1   *
+     *   /\ /\  / \/ \
+     *  * * * * t ** *
+     *
+     * @param deadEnds
+     * @param target
+     * @return
+     */
+    public static int unlockDoubleBFS(List<String> deadEnds,String target){
+        Queue<String> q1 = new LinkedList<>();  //第一个需要扩散的队列
+        Queue<String> q2 = new LinkedList<>(); // 第二个需要扩散的队列
+        Set<String> visited = new HashSet<>();
+        String start = "0000";
+        q1.offer(start);
+        q2.offer(target);
+        visited.add(start);
+        int step = 0;
+
+        while (!q1.isEmpty() && !q2.isEmpty()){
+
+            int size =  q1.size();
+            for(int i = 0 ; i < size;i ++){
+                String cur = q1.poll();
+                if(deadEnds.contains(cur)) continue;
+                if(q2.contains(cur)){
+                    return step;
+                }
+                visited.add(cur);
+                for(int j = 0; j < cur.length() ; j ++){
+                    String plus = plusOne(cur,j);
+                    if(!visited.contains(plus)){
+                        q1.add(plus);
+                    }
+                    String minus = minusOne(cur,j);
+                    if(!visited.contains(minus)){
+                        q1.add(minus);
+                    }
+                }
+            }
+            step ++;
+            Queue<String> temp = q1;
+            q1 = q2;
+            q2 = temp;
+        }
+        return -1;
+    }
 
     private static String plusOne(String s, int j){
         char[] ch = s.toCharArray();
@@ -71,7 +133,7 @@ public class UnlockMinStep {
         List<String> deadends = new ArrayList<>();
         deadends.add("0100");
         deadends.add("1000");
-        System.out.println(unlock(deadends,"0200"));
+        System.out.println(unlockDoubleBFS(deadends,"0200"));
 
         deadends.clear();
         deadends.add("8887");
@@ -82,7 +144,7 @@ public class UnlockMinStep {
         deadends.add("8988");
         deadends.add("9888");
         deadends.add("7888");
-        System.out.println(unlock(deadends,"8888"));
+        System.out.println(unlockDoubleBFS(deadends,"8888"));
     }
 
 }
