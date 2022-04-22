@@ -17,7 +17,7 @@ public class LeftRightPointer {
         while (left <= right){
             int mid = left + (right - left) / 2;
             if(target == nums[mid]){
-                return target;
+                return mid;
             }else if(nums[mid] < target){
                 left = mid  + 1;
             } else {
@@ -25,5 +25,33 @@ public class LeftRightPointer {
             }
         }
         return  -1;
+    }
+
+    public static int[] twoSum(int[] nums, int target){
+        int left = 0;
+        int right = nums.length - 1;
+        while (left < right){
+            int sum = nums[left] + nums[right];
+            if(sum == target){
+                return new int[]{left,right};
+            } else if(sum < target){
+                left ++;  //让sum大一点
+            } else {
+                right --; //让sum小一点
+            }
+        }
+        return new int[]{-1,-1};
+    }
+
+    public static void main(String[] args) {
+        int[] nums = new int[] {1,3,9,12,17,30};
+
+        System.out.println(binarySearch(nums,17));
+        System.out.println(binarySearch(nums,8));
+
+        int[] result = twoSum(nums,26);
+        for (int num : result){
+            System.out.println(num);
+        }
     }
 }
