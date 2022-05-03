@@ -44,6 +44,6 @@ public class TreeMinHeight {
     }
 
     public static void main(String[] args) {
-        System.out.println(getMinHeight(BNode.testFree()));
+        System.out.println(getMinHeight(BNode.testTree()));
     }
 }

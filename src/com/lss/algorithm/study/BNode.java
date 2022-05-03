@@ -20,10 +20,10 @@ public class BNode<T> {
      *      \    /  \
      *       7   6  5
      *          /    \
-     *         4     3
+     *          4     3
      * @return
      */
-    public static BNode<Integer> testFree(){
+    public static BNode<Integer> testTree(){
         BNode<Integer> tree = new BNode<>(10);
         BNode<Integer> node9 = new BNode(9);
         node9.right = new BNode(7);
