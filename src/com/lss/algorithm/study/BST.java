@@ -178,6 +178,36 @@ public class BST {
         middleTraverse(root.right);
     }
 
+    /**
+     *
+     * @param root 完全二叉树根节点
+     * @return     完全二叉树节点个数
+     */
+    public static int getCompleteBinaryTreeNodeCount(BNode<Integer> root){
+        BNode<Integer> l = root,r  = root;
+
+        //左右两边高度
+        int hl = 0 ,hr = 0;
+
+        while(l != null){
+            l = l.left;
+            hl ++;
+        }
+
+        while (r != null){
+            r = r.right;
+            hr ++;
+        }
+
+        //左右高度一样是满二叉树
+        if(hl == hr){
+            return  (int) Math.pow(2,hl) - 1;
+        }
+
+        //完全二叉树左右子树依然是完全二叉树
+        return 1 + getCompleteBinaryTreeNodeCount(root.left)  + getCompleteBinaryTreeNodeCount(root.right);
+    }
+
     public static void main(String[] args) {
         middleTraverse(buildTestTree());
         System.out.println(isSameTree(buildTestSameTree1(),buildTestSameTree2()));
