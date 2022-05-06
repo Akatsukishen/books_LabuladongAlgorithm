@@ -1,5 +1,8 @@
 package com.lss.algorithm.study;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 /**
  * Binary Search Tree : 二叉搜索树
  *
@@ -208,6 +211,163 @@ public class BST {
         return 1 + getCompleteBinaryTreeNodeCount(root.left)  + getCompleteBinaryTreeNodeCount(root.right);
     }
 
+
+    /**
+     * 前序遍历字符串反序列化: # 代表空节点
+     *  1,2,#,4,#,#,3,#,#
+     * @param data
+     * @return
+     */
+    public static BNode<Integer> deserializeByPre(String data){
+        LinkedList<String> nodes = new LinkedList<>();
+        for(String s : data.split(",")){
+            nodes.add(s);
+        }
+        return deserializeByPre(nodes);
+    }
+
+    private static BNode<Integer> deserializeByPre(LinkedList<String> nodes){
+        if(nodes.isEmpty()){
+            return null;
+        }
+        String first = nodes.removeFirst();
+        if("#".equals(first)){
+            return null;
+        }
+        BNode<Integer> bNode = new BNode<>(Integer.parseInt(first));
+        bNode.left = deserializeByPre(nodes);
+        bNode.right = deserializeByPre(nodes);
+
+        return bNode;
+    }
+
+    public static String serializeByPre(BNode<Integer> node){
+        StringBuilder sb = new StringBuilder();
+        serializeByPre(node,sb);
+        return sb.toString();
+    }
+
+    private static void serializeByPre(BNode<Integer> root,StringBuilder sb){
+        if(root == null){
+            sb.append("#,");
+            return;
+        }
+
+        sb.append(root.value).append(",");
+
+        serializeByPre(root.left,sb);
+        serializeByPre(root.right,sb);
+    }
+
+    /**
+     * 后序遍历反序列化结果：
+     * @param data
+     * @return
+     */
+    public static BNode<Integer> deserializeByAfter(String data){
+        LinkedList<String> nodes = new LinkedList<>();
+        for(String s : data.split(",")){
+            nodes.add(s);
+        }
+        return deserializeByAfter(nodes);
+    }
+
+    private static BNode<Integer> deserializeByAfter(LinkedList<String> nodes){
+        if(nodes.isEmpty()){
+            return null;
+        }
+        String last = nodes.removeLast();
+        if("#".equals(last)){
+            return null;
+        }
+        BNode<Integer> root = new BNode<>(Integer.parseInt(last));
+        root.right = deserializeByAfter(nodes);
+        root.left = deserializeByAfter(nodes);
+        return root;
+    }
+
+    public static String serializeByAfter(BNode<Integer> root){
+        StringBuilder sb = new StringBuilder();
+        serializeByAfter(root,sb);
+        return sb.toString();
+    }
+
+    private static void serializeByAfter(BNode<Integer> root, StringBuilder sb){
+        if(root == null){
+            sb.append("#").append(",");
+            return;
+        }
+
+        serializeByAfter(root.left,sb);
+        serializeByAfter(root.right,sb);
+
+        sb.append(root.value).append(",");
+    }
+
+    public static String serializeByLevel(BNode<Integer> root){
+        if(root == null){
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        Queue<BNode<Integer>> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()){
+            BNode<Integer> cur = queue.poll();
+            if(cur == null){
+                sb.append("#").append(",");
+            } else {
+                sb.append(cur.value).append(",");
+                queue.add(cur.left);
+                queue.add(cur.right);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static BNode<Integer> deserializeByLevel(String serialize){
+        LinkedList<String> inputs = new LinkedList<>();
+        for(String s : serialize.split(",")){
+            inputs.add(s);
+        }
+        return deserializeByLevel(inputs);
+    }
+
+    private static BNode<Integer> deserializeByLevel(LinkedList<String> inputs){
+
+        if(inputs.isEmpty()){
+            return null;
+        }
+
+        BNode<Integer> root ;
+        LinkedList<BNode<Integer>> nodes = new LinkedList<>();
+
+        String rootValue = inputs.poll();
+        if("#".equals(rootValue)) {
+            return null;
+        } else {
+            root = new BNode<>(Integer.parseInt(rootValue));
+            nodes.add(root);
+        }
+
+        while (!nodes.isEmpty()){
+            BNode<Integer> cur = nodes.poll();
+            String left = inputs.poll();
+            if(!"#".equals(left)){
+                cur.left = new BNode<Integer>(Integer.parseInt(left));
+                nodes.add(cur.left);
+            }
+            String right = inputs.poll();
+            if(!"#".equals(right)){
+                cur.right = new BNode<Integer>(Integer.parseInt(right));
+                nodes.add(cur.right);
+            }
+        }
+
+        return root;
+    }
+
     public static void main(String[] args) {
         middleTraverse(buildTestTree());
         System.out.println(isSameTree(buildTestSameTree1(),buildTestSameTree2()));
@@ -241,5 +401,26 @@ public class BST {
         dTree = delete(dTree,2);
         System.out.println("After delete 2");
         middleTraverse(dTree);
+
+        System.out.println("deserialize by pre");
+        BNode<Integer> dePre = deserializeByPre("1,2,#,4,#,#,3,#,#");
+        middleTraverse(dePre);
+
+        System.out.println("serialize by pre :" + serializeByPre(dePre));
+
+        System.out.println("deserialize by after");
+        dePre = deserializeByAfter("#,#,#,4,2,#,#,3,1");
+        middleTraverse(dePre);
+
+        System.out.println("serialize by after :" + serializeByAfter(dePre));
+
+        System.out.println("serialize by level");
+        String result = serializeByLevel(dePre);
+        System.out.println("serialize by level = " + result);
+
+        System.out.println("deserialize by level");
+        BNode<Integer> level = deserializeByLevel(result);
+        middleTraverse(level);
+
     }
 }
