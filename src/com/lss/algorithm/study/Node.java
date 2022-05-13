@@ -14,4 +14,13 @@ public class Node<T> {
     public Node(T value) {
         this.value = value;
     }
+
+    public void traverse(){
+        Node<T> cur = this;
+        while (cur != null){
+            System.out.print(cur.value + " --> " );
+            cur = cur.next;
+        }
+        System.out.println("NULL");
+    }
 }
