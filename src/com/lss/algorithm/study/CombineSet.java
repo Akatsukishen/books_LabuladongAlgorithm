@@ -28,9 +28,6 @@ public class CombineSet {
             return;
         }
         for(int i = start ; i < nums.size() ; i ++){
-            if(picked.contains(nums.get(i))){
-                continue;
-            }
             picked.add(nums.get(i));
             combine(nums,picked,i + 1,k,result);
             picked.remove(picked.size() - 1);
